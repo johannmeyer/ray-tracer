@@ -15,8 +15,8 @@ int main()
     {
         for (int c = 0; c < image.get_cols(); c++)
         {
-            Color pixel_color(double(c) / (image_rows-1),
-                              double(r) / (image_cols-1),
+            Color pixel_color(double(c) / (image_cols-1),
+                              double(r) / (image_rows-1),
                               0.25);
 
             image.set(r,c,pixel_color);

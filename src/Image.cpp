@@ -23,7 +23,7 @@ int Image::get_cols() const
     return cols;
 }
 
-int Image::save_image(std::string filename) const
+int Image::save_image(const std::string& filename) const
 {
     std::ofstream file;
 
@@ -72,12 +72,12 @@ Vec3 Image::get(int r, int c) const
     return data[ind(r,c)];
 }
 
-void Image::set(int r, int c, Vec3 v)
+void Image::set(int r, int c, const Vec3& v)
 {
     data[ind(r,c)] = v;
 }
 
-std::ostream &operator<<(std::ostream &ostream, Image &image)
+std::ostream &operator<<(std::ostream& ostream, Image& image)
 {
     return ostream << image.to_string();
 }

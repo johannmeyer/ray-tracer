@@ -24,11 +24,11 @@ class Image
 
         Vec3 get(int row, int col) const;
 
-        void set(int row, int col, Vec3 value);
+        void set(int row, int col, const Vec3& value);
 
-        int save_image(std::string filename) const;
+        int save_image(const std::string& filename) const;
 };
 
-std::ostream &operator<<(std::ostream &ostream, Image &image);
+std::ostream &operator<<(std::ostream& ostream, Image& image);
 
 #endif
