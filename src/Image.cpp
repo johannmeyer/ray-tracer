@@ -3,8 +3,11 @@
 #include <fstream>
 #include <cstring>
 
+#include "Ascii.h"
+
 // Helper function for indices
 #define ind(r,c) (r*cols + c)
+
 
 // Constructor
 Image::Image(int rows, int cols) : 
@@ -75,6 +78,37 @@ Vec3 Image::get(int r, int c) const
 void Image::set(int r, int c, const Vec3& v)
 {
     data[ind(r,c)] = v;
+}
+
+/*
+    Converts the image to a grayscale ASCII representation of the image.
+*/
+Image Image::to_ascii_image()
+{
+    const int new_rows = rows - (rows % ASCII_HEIGHT);
+    const int num_ascii_per_col = rows/ASCII_HEIGHT;
+    const int new_cols = cols - (cols % ASCII_WIDTH);
+    const int num_ascii_per_row = cols/ASCII_WIDTH;
+
+    Image ascii_image(new_rows, new_cols);
+    for (int r = 0; r < num_ascii_per_col; r++)
+    {
+        for (int c = 0; c < num_ascii_per_row; c++)
+        {
+            const Color old_color = this->get(r*ASCII_HEIGHT+ASCII_HEIGHT/2, c*ASCII_WIDTH+ASCII_WIDTH/2);
+            const int brightness = (old_color.x() + old_color.y() + old_color.z())*(ASCII_TABLE_LENGTH-1)/3.0;
+            const bool *character = ASCII_TABLE[brightness];
+            
+            // This loop can be executed in parallel and enables resuse of the above data.
+            // Additionally, better cache locality, since neighbouring threads access the same character.
+            for (int i = 0; i < ASCII_LENGTH; i++)
+            {
+                Color pixel_color(character[i],character[i], character[i]);
+                ascii_image.set(r*ASCII_HEIGHT + i/ASCII_WIDTH,c*ASCII_WIDTH + i%ASCII_WIDTH, pixel_color);
+            }
+        }
+    }
+    return ascii_image;
 }
 
 std::ostream &operator<<(std::ostream& ostream, Image& image)

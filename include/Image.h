@@ -27,6 +27,8 @@ class Image
         void set(int row, int col, const Vec3& value);
 
         int save_image(const std::string& filename) const;
+
+        Image to_ascii_image();
 };
 
 std::ostream &operator<<(std::ostream& ostream, Image& image);

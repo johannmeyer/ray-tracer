@@ -124,6 +124,14 @@ inline Vec3 cross(const Vec3& u, const Vec3& v)
 
 inline Vec3 unit_vector(const Vec3& v)
 {
+    double length = v.length();
+    // This can cause numerical issues. A simple alternative is
+    // to always add 1e-6
+    if (length < 1e-6)
+    {
+        std::cerr << "Warning (unit_vector): v.length < 1e-6" << std::endl;
+        return v/(length + 1e-6);
+    }
     return v/v.length();
 }
 
