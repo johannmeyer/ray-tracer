@@ -16,7 +16,7 @@ set (CMAKE_CXX_STANDARD 11)
 # Header files
 include_directories(include)
 
-set(SRCS src/Image.cpp src/Sphere.cpp src/World.cpp src/Camera.cpp)
+set(SRCS src/Image.cpp src/Sphere.cpp src/World.cpp src/Camera.cpp src/Lambertian.cpp src/Metal.cpp)
 
 add_executable(RayTracer src/main.cpp ${SRCS})
 add_executable(ImageTest tests/ImageTest/ImageTest.cpp ${SRCS})

@@ -9,10 +9,22 @@
 // Class prototype
 class Vec3;
 
-// Function prototypes for special functions
-inline double dot(const Vec3& u, const Vec3& v);
-inline Vec3 cross(const Vec3& u, const Vec3& v);
-inline Vec3 unit_vector(const Vec3& v);
+// Type aliases for Vec3
+using Point3 = Vec3;   // 3D point
+using Color = Vec3;    // RGB color
+
+// Function prototypes for free functions
+std::ostream& operator<<(std::ostream& out, const Vec3& v);
+Vec3 operator+(const Vec3& u, const Vec3& v);
+Vec3 operator-(const Vec3& u, const Vec3& v);
+Vec3 operator*(const Vec3& u, const Vec3& v);
+Vec3 operator*(double t, const Vec3& v);
+Vec3 operator*(const Vec3& v, double t);
+Vec3 operator/(const Vec3& v, double t);
+double dot(const Vec3& u, const Vec3& v);
+Vec3 cross(const Vec3& u, const Vec3& v);
+Vec3 unit_vector(const Vec3& v);
+bool approx_equals(const Vec3& u, const Vec3& v);
 
 class Vec3
 {
@@ -71,6 +83,21 @@ class Vec3
         double length_squared() const
         {
             return dot(*this, *this);
+        }
+
+        bool approx_equals(const Vec3& v) const
+        {
+            // not overriding operator= to be explicit
+            // about approximation.
+            const double epsilon = 1e-8;
+            return std::fabs(data[0] - v.data[0]) < epsilon
+                && std::fabs(data[1] - v.data[1]) < epsilon
+                && std::fabs(data[2] - v.data[2]) < epsilon;
+        }
+
+        Vec3 reflect(const Vec3& normal)
+        {
+            return *this - 2*dot(*this, normal)*normal;
         }
 
         inline static Vec3 random()
@@ -177,9 +204,5 @@ inline Vec3 unit_vector(const Vec3& v)
     // }
     return v/v.length();
 }
-
-// Type aliases for Vec3
-using Point3 = Vec3;   // 3D point
-using Color = Vec3;    // RGB color
 
 #endif

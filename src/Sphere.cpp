@@ -36,6 +36,7 @@ bool Sphere::hit(const Ray& ray, double min_ray_length, double max_ray_length, H
     hit_rec.ray_length = ray_length;
     hit_rec.p = ray.at(hit_rec.ray_length);
     hit_rec.set_face_normal(ray, this->get_outward_normal(hit_rec.p));
+    hit_rec.mat_ptr = mat_ptr;
 
     return true;
 }

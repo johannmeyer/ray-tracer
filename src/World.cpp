@@ -48,9 +48,11 @@ Color World::get_ray_color(const Ray& ray, int depth) const
     // Check if ray hits an object in the scene
     if (this->hit(ray, 1e-3, INF, rec))
     {
-        Point3 target = rec.p + rec.normal + Vec3::random_unit_vector();
-        Ray bounced_ray(rec.p, target - rec.p);
-        return 0.5*get_ray_color(bounced_ray, depth -1);
+        Ray scattered;
+        Color attenuation;
+        if (rec.mat_ptr->scatter(ray, rec, attenuation, scattered))
+            return attenuation*get_ray_color(scattered, depth -1);
+        return Color(0,0,0);
     }
     else
     {
