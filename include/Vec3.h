@@ -4,6 +4,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "Utility.h"
+
 // Class prototype
 class Vec3;
 
@@ -66,6 +68,43 @@ class Vec3
             return dot(*this, *this);
         }
 
+        inline static Vec3 random()
+        {
+            return Vec3(random_double(), random_double(), random_double());
+        }
+
+        inline static Vec3 random(double min, double max)
+        {
+            return Vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+        }
+
+        /*
+            Rejection-based algorithm for finding a random point within a unit sphere.
+        */
+        static Vec3 random_in_unit_sphere()
+        {
+            while (true)
+            {
+                Vec3 p = Vec3::random(-1,1);
+                if (p.length_squared() >= 1) continue;
+                return p;
+            }
+        }
+
+        static Vec3 random_unit_vector()
+        {
+            return unit_vector(random_in_unit_sphere());
+        }
+
+        static Vec3 random_in_hemisphere(rec.normal)
+        {
+            Vec3 in_unit_sphere == random_in_unit_sphere();
+            if dot(in_unit_sphere, normal) > 0)
+                return in_unit_sphere;
+            else
+                return -in_unit_sphere;
+        }
+
 };
 
 inline std::ostream& operator<<(std::ostream& out, const Vec3& v)
@@ -124,14 +163,13 @@ inline Vec3 cross(const Vec3& u, const Vec3& v)
 
 inline Vec3 unit_vector(const Vec3& v)
 {
-    double length = v.length();
     // This can cause numerical issues. A simple alternative is
     // to always add 1e-6
-    if (length < 1e-6)
-    {
-        std::cerr << "Warning (unit_vector): v.length < 1e-6" << std::endl;
-        return v/(length + 1e-6);
-    }
+    // if (length < 1e-6)
+    // {
+    //     std::cerr << "Warning (unit_vector): v.length < 1e-6" << std::endl;
+    //     return v/(length + 1e-6);
+    // }
     return v/v.length();
 }
 

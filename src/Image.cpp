@@ -60,12 +60,20 @@ std::string Image::to_string() const
     {
         for (int c = 0; c < cols; c++)
         {
-            Vec3 value = this->get(r,c);
-            output += std::to_string(static_cast<int>(value.x()*255)) + ' ';
-            output += std::to_string(static_cast<int>(value.y()*255)) + ' ';  
-            output += std::to_string(static_cast<int>(value.z()*255)) + '\n'; 
+            Color pixel_color = this->get(r,c);
+            double r = pixel_color.x();
+            double g = pixel_color.y();
+            double b = pixel_color.z();
+
+            // Gamma correct (gamma = 2)
+            r = std::sqrt(r);
+            g = std::sqrt(g);
+            b = std::sqrt(b);
+
+            output += std::to_string(static_cast<int>(clamp(r,0,1)*255)) + ' ';
+            output += std::to_string(static_cast<int>(clamp(g,0,1)*255)) + ' ';  
+            output += std::to_string(static_cast<int>(clamp(b,0,1)*255)) + '\n'; 
         }
-        
     }
     return output;
 }

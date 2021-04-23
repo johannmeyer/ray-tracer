@@ -1,5 +1,6 @@
 #include "World.h"
 #include "Utility.h"
+#include "Vec3.h"
 
 void World::clear()
 {
@@ -37,13 +38,19 @@ bool World::hit(const Ray& ray, double min_ray_length, double max_ray_length, Hi
 /*
     Determines the color of a ray cast in the world.
 */
-Color World::get_ray_color(const Ray& ray) const
+Color World::get_ray_color(const Ray& ray, int depth) const
 {
+    // Max ray bounce limit exceeded
+    if (depth <= 0)
+        return Color(0,0,0);
+
     HitRecord rec;
     // Check if ray hits an object in the scene
-    if (this->hit(ray, 0, INF, rec))
+    if (this->hit(ray, 1e-3, INF, rec))
     {
-        return 0.5 * (rec.normal + Color(1,1,1));
+        Point3 target = rec.p + rec.normal + Vec3::random_unit_vector();
+        Ray bounced_ray(rec.p, target - rec.p);
+        return 0.5*get_ray_color(bounced_ray, depth -1);
     }
     else
     {

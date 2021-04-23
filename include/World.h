@@ -17,7 +17,7 @@ class World : public Hittable
         void clear();
         void add(std::shared_ptr<Hittable> object);
 
-        Color get_ray_color(const Ray& ray) const;
+        Color get_ray_color(const Ray& ray, int depth) const;
 
         virtual bool hit(const Ray& ray, double min_ray_length, double max_ray_length, HitRecord& hit_rec) const override;
 };

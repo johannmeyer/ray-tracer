@@ -21,6 +21,8 @@ Ray Camera::get_ray(double u, double v) const
 
 Image Camera::get_image(int image_cols, World world, const bool antialiasing) const
 {
+    const int max_ray_collisions = 50;
+
     const int image_rows = static_cast<int>(image_cols / aspect_ratio);
     Image image(image_rows, image_cols);
     
@@ -37,10 +39,11 @@ Image Camera::get_image(int image_cols, World world, const bool antialiasing) co
                 double u = (double(c) + random_double())/ (image_cols-1);
                 double v = (double(r) + random_double())/ (image_rows-1);
                 Ray ray = get_ray(u,v);
-                pixel_color += world.get_ray_color(ray);
+                pixel_color += world.get_ray_color(ray, max_ray_collisions);
             }
             image.set(r, c, pixel_color/samples_per_pixel);
         }
+        std::cerr << r*100/image_rows << "% complete" << std::endl;
     }
     return image;
 }

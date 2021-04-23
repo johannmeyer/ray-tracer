@@ -13,7 +13,7 @@ bool Sphere::hit(const Ray& ray, double min_ray_length, double max_ray_length, H
     Vec3 oc = ray.origin() - this->center;
     
     // Code simplifies by changing b to b/2.
-    double a = dot(ray.direction(), ray.direction());
+    double a = ray.direction().length_squared();
     double half_b = dot(oc, ray.direction());
     double c = oc.length_squared() - radius*radius;
 
@@ -22,7 +22,7 @@ bool Sphere::hit(const Ray& ray, double min_ray_length, double max_ray_length, H
     // Ray does not intersect with sphere
     if (discriminant < 0) return false;
 
-    // Apply camera clipping
+    // Apply camera/ray clipping (solves shadow acne)
     double sqrt_d = std::sqrt(discriminant);
     double ray_length = (-half_b - sqrt_d)/a;
     if (ray_length < min_ray_length || ray_length > max_ray_length)
