@@ -26,6 +26,11 @@ class Vec3
         double y() const { return data[1]; }
         double z() const { return data[2]; }
 
+        // Aliases of the member functions for when it is used as a Color
+        inline double r() const { return x(); }
+        inline double g() const { return y(); }
+        inline double b() const { return z(); }
+
         Vec3 operator-() const { return Vec3(-data[0], -data[1], -data[2]); }
         double operator[](int i) const { return data[i]; }
         double& operator[](int i) { return data[i]; }
@@ -96,10 +101,10 @@ class Vec3
             return unit_vector(random_in_unit_sphere());
         }
 
-        static Vec3 random_in_hemisphere(rec.normal)
+        static Vec3 random_in_hemisphere(Vec3 normal)
         {
-            Vec3 in_unit_sphere == random_in_unit_sphere();
-            if dot(in_unit_sphere, normal) > 0)
+            Vec3 in_unit_sphere = random_in_unit_sphere();
+            if (dot(in_unit_sphere, normal) > 0)
                 return in_unit_sphere;
             else
                 return -in_unit_sphere;

@@ -61,9 +61,9 @@ std::string Image::to_string() const
         for (int c = 0; c < cols; c++)
         {
             Color pixel_color = this->get(r,c);
-            double r = pixel_color.x();
-            double g = pixel_color.y();
-            double b = pixel_color.z();
+            double r = pixel_color.r();
+            double g = pixel_color.g();
+            double b = pixel_color.b();
 
             // Gamma correct (gamma = 2)
             r = std::sqrt(r);
