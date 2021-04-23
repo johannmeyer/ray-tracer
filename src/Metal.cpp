@@ -6,9 +6,8 @@ bool Metal::scatter(const Ray& incident, const HitRecord& rec, Color& attenuatio
 {
     Vec3 reflected = unit_vector(incident.direction()).reflect(rec.normal);
 
-    scattered = Ray(rec.p, reflected);
+    scattered = Ray(rec.p, reflected + roughness*Vec3::random_in_unit_sphere());
     attenuation = albedo;
-    if (!(dot(scattered.direction(), rec.normal) > 0))
-        std::cout << "Metal scatter is negative" << std::endl;
+
     return (dot(scattered.direction(), rec.normal) > 0);
 }

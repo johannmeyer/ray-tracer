@@ -25,8 +25,9 @@ class Metal : public Material
 {
     public:
         Color albedo;
+        double roughness;
 
-        Metal(const Color& albedo) : albedo(albedo) {}
+        Metal(const Color& albedo, double roughness) : albedo(albedo), roughness(roughness) {}
 
         virtual bool scatter(const Ray& incident, const HitRecord& rec, Color& attenuation, Ray& scattered) const override;
 };
