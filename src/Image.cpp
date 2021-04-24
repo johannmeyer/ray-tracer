@@ -93,6 +93,7 @@ void Image::set(int r, int c, const Vec3& v)
 */
 Image Image::to_ascii_image()
 {
+    // Divide the image into a coarser grid where each block represents an ASCII character.
     const int new_rows = rows - (rows % ASCII_HEIGHT);
     const int num_ascii_per_col = rows/ASCII_HEIGHT;
     const int new_cols = cols - (cols % ASCII_WIDTH);
@@ -103,15 +104,24 @@ Image Image::to_ascii_image()
     {
         for (int c = 0; c < num_ascii_per_row; c++)
         {
-            const Color old_color = this->get(r*ASCII_HEIGHT+ASCII_HEIGHT/2, c*ASCII_WIDTH+ASCII_WIDTH/2);
+            // Compute mean intensity for the character block.
+            Color old_color(0,0,0);
+            for (int i = 0; i < ASCII_LENGTH; i++)
+            {
+                old_color += this->get(r*ASCII_HEIGHT + i/ASCII_WIDTH,c*ASCII_WIDTH + i%ASCII_WIDTH);
+            }
+            old_color /= ASCII_LENGTH;
+
+            // Use the intensity to determine which character should be used for the 
             const int brightness = (old_color.x() + old_color.y() + old_color.z())*(ASCII_TABLE_LENGTH-1)/3.0;
             const bool *character = ASCII_TABLE[brightness];
             
             // This loop can be executed in parallel and enables resuse of the above data.
-            // Additionally, better cache locality, since neighbouring threads access the same character.
+            // Additionally, better cache locality than iterating in a scanline approach, 
+            // since neighbouring threads access the same character's data.
             for (int i = 0; i < ASCII_LENGTH; i++)
             {
-                Color pixel_color(character[i],character[i], character[i]);
+                Color pixel_color = character[i] * old_color;
                 ascii_image.set(r*ASCII_HEIGHT + i/ASCII_WIDTH,c*ASCII_WIDTH + i%ASCII_WIDTH, pixel_color);
             }
         }
