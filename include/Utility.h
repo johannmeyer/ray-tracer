@@ -7,6 +7,7 @@
 
 const double INF = std::numeric_limits<double>::infinity();
 const double PI = 3.1415926535897932385;
+const double epsilon = 1e-8; // used for precision checks
 
 /*
     Convert from degrees to radians
@@ -36,6 +37,11 @@ inline double clamp(double x, double min, double max)
     if (x < min) return min;
     if (x > max) return max;
     return x;
+}
+
+inline bool approx_equals(double x, double y)
+{
+    return std::fabs(x-y) < epsilon;
 }
 
 #endif

@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <cassert>
 
 #include "Utility.h"
 
@@ -89,15 +90,29 @@ class Vec3
         {
             // not overriding operator= to be explicit
             // about approximation.
-            const double epsilon = 1e-8;
             return std::fabs(data[0] - v.data[0]) < epsilon
                 && std::fabs(data[1] - v.data[1]) < epsilon
                 && std::fabs(data[2] - v.data[2]) < epsilon;
         }
 
-        Vec3 reflect(const Vec3& normal)
+        Vec3 reflect(const Vec3& normal) const
         {
             return *this - 2*dot(*this, normal)*normal;
+        }
+
+        Vec3 refract(const Vec3& normal, double etai_over_etat) const
+        {
+            // eta_incident over eta_transmitted
+            // fmin protects against NaNs
+            // This function assumes both normal and the incident vector (*this)
+            // is normalised.
+            // assert(::approx_equals(normal.length_squared(), 1.0));
+            // assert(::approx_equals(this->length_squared(), 1.0));
+
+            double cos_theta = std::fmin(dot(-*this, normal), 1.0);
+            Vec3 ray_out_perp = etai_over_etat * (*this + cos_theta*normal);
+            Vec3 ray_out_parallel = - std::sqrt(std::fabs(1.0 - ray_out_perp.length_squared()))*normal;
+            return ray_out_perp + ray_out_parallel;
         }
 
         inline static Vec3 random()

@@ -32,4 +32,18 @@ class Metal : public Material
         virtual bool scatter(const Ray& incident, const HitRecord& rec, Color& attenuation, Ray& scattered) const override;
 };
 
+class Dielectric : public Material
+{
+    public:
+        Color albedo;
+        double ir;
+
+        Dielectric(const Color &albedo, double index_of_refraction) : albedo(albedo), ir(index_of_refraction) {}
+
+        virtual bool scatter(const Ray& incident, const HitRecord& rec, Color& attenuation, Ray& scattered) const override;        
+
+    private:
+        static double reflectance(double cos_theta, double eta_t);
+};
+
 #endif

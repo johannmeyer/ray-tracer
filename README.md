@@ -19,7 +19,7 @@ ascii_image.save_image("ascii.ppm");
 ```
 
 # Creating Materials
-At present, two materials have been added: Lambertian (diffuse) and Metal. Both materials require the albedo to be specified. Metal has an additional roughness parameter.
+At present, three materials have been added: Lambertian (diffuse), Metal, and Dielectric. All materials require the albedo to be specified. Metal has an additional roughness parameter and Dielectrics require the index of refraction to be specified. The index of refraction of glass is between 1.3 and 1.7.
 
 ![Metal and Lambertian Spheres](<./output-images/Metal and Lambertian Spheres.png>)
 
@@ -29,6 +29,7 @@ At present, two materials have been added: Lambertian (diffuse) and Metal. Both 
 
 auto material_lambertian = std::make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
 auto material_metal = std::make_shared<Metal>(Color(0.8, 0.8, 0.8), 0.3);
+auto material_dielectric   = std::make_shared<Dielectric>(Color(1,1,1), 1.5);
 ```
 
 # Creating a Scene (World) and Adding Objects
@@ -48,6 +49,17 @@ const Point3 position = Point3(0.0, 0.0, -1.0);
 const double radius = 0.5;
 auto material = std::make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
 world.add(std::make_shared<Sphere>(position, radius, material));
+```
+
+## Hollow Objects
+Hollow objects can be created using dielectric materials with a negative radius at the same position as another dielectric material.
+
+```cpp
+Point3 position(0.0, 0.0, -1.0);
+const double outer_radius = 0.5;
+const double inner_radius = -0.4;
+world.add(std::make_shared<Sphere>(position, outer_radius, material_dielectric));
+world.add(std::make_shared<Sphere>(position, inner_radius, material_dielectric));
 ```
 
 # Creating a Camera and Ray Tracing the World
