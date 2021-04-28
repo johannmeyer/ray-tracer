@@ -57,25 +57,40 @@ Hollow objects can be created using dielectric materials with a negative radius 
 ```cpp
 Point3 position(0.0, 0.0, -1.0);
 const double outer_radius = 0.5;
-const double inner_radius = -0.4;
+const double inner_radius = -0.4; // note negative sign
 world.add(std::make_shared<Sphere>(position, outer_radius, material_dielectric));
 world.add(std::make_shared<Sphere>(position, inner_radius, material_dielectric));
 ```
 
 # Creating a Camera and Ray Tracing the World
-To ray trace a scene, a camera needs to be added. The position and orientation of the camera is currently fixed. The call to `get_image()` rasterises the world scene and performs the ray tracing. The images are gamma corrected ($\gamma$=2) when they are saved to a `.ppm` file. The images are ray traced with stochastic ray positions within a pixel and thus results in a nice antialiased image. However, due to the stochasticity in ray bounces, the images require large amounts of samples per pixel to avoid noisy images.
+To ray trace a scene, a camera needs to be added. The call to `get_image()` rasterises the world scene and performs the ray tracing. The images are gamma corrected ($\gamma$=2) when they are saved to a `.ppm` file. The images are ray traced with stochastic ray positions within a pixel and thus results in a nice antialiased image. However, due to the stochasticity in ray bounces, the images require large amounts of samples per pixel to avoid noisy images. `CameraSettings` and `RenderSettings` are used to reduce the number of parameters required to create a camera and render a scene and provide some defaults for parameters.
 
 ## Example
 ```cpp
 #include "Camera.h"
 #include "Image.h"
 
+// Set camera position and orientation
+Point3 lookfrom(13,2,3);
+Point3 lookat(0,0,0);
+Vec3 vup(0,1,0);
+Orientation orientation(lookfrom, lookat, vup);
+
+// Set camera settings
+CameraSettings camera_settings;
+camera_settings.aspect_ratio = 3.0/2.0;
+camera_settings.vertical_fov = 20;
+const double aperture = 0.1;
+const double focus_dist = 10.0;
+camera_settings.depth_of_field(aperture, focus_dist);
+
 // Create camera
-Camera camera;
+Camera camera(orientation, camera_settings);
 
 // Capture scene
-const int image_width = 400;
-Image image = camera.get_image(image_width, world);
+RenderSettings render_settings;
+render_settings.samples_per_pixel = 500;
+Image image = camera.get_image(world, render_settings);
 
 // Save images to files
 image.save_image("ray-traced-image.ppm");
