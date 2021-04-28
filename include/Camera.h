@@ -5,22 +5,26 @@
 #include "Ray.h"
 #include "Image.h"
 #include "World.h"
+#include "RenderSettings.h"
+#include "Orientation.h"
+#include "CameraSettings.h"
 
 class Camera
 {
     private:
-        Point3 origin;
+        Orientation orientation;
         Point3 top_left_corner;
         Vec3 horizontal;
         Vec3 vertical;
         double aspect_ratio;
+        double lens_radius;
 
     public:
-        Camera();
+        Camera(const Orientation& orientation, const CameraSettings& camera_settings);
         
         Ray get_ray(double u, double v) const;
 
-        Image get_image(int width, World world, bool antialiasing = true) const;
+        Image get_image(World world, const RenderSettings& render_settings) const;
 };
 
 #endif

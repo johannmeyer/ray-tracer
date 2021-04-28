@@ -152,6 +152,19 @@ class Vec3
                 return -in_unit_sphere;
         }
 
+        /*
+            Rejection-based algorithm for finding a random point within a unit circle.
+        */
+        static Vec3 random_in_unit_circle()
+        {
+            while (true)
+            {
+                Vec3 p(random_double(-1,1), random_double(-1,1), 0);
+                if (p.length_squared() >= 1) continue;
+                return p;
+            }
+        }
+
 };
 
 inline std::ostream& operator<<(std::ostream& out, const Vec3& v)
