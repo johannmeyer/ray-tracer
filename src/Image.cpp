@@ -16,6 +16,47 @@ Image::Image(int rows, int cols) :
                 data(cols*rows, Vec3(0,0,0)){}
 
 
+Image::Image(const std::string& filename)
+{
+    std::ifstream file;
+
+    file.open(filename);
+    if (file.fail())
+    {
+        std::cerr << std::strerror(errno) << std::endl;
+        throw -1; // Replace with std::exception
+    }
+
+    std::string format;
+    file >> format;
+    assert(format == "P3");
+
+    file >> cols;
+    file >> rows;
+
+    data.reserve(cols*rows);
+
+    int scale;
+    file >> scale;
+
+    Color pixel_color;
+    for (int r = 0; r < rows; r++)
+    {
+        for (int c = 0; c < cols; c++)
+        {    
+            file >> pixel_color;
+            this->set(r,c, pixel_color/scale);
+        }
+    }
+
+    file.close();
+    if (file.fail())
+    {
+        std::cerr << std::strerror(errno) << std::endl;
+        throw -1;
+    }
+}
+
 int Image::get_rows() const
 {
     return rows;
@@ -81,6 +122,17 @@ std::string Image::to_string() const
 Vec3 Image::get(int r, int c) const
 {
     return data[ind(r,c)];
+}
+
+Vec3 Image::get(double r, double c) const
+{
+    assert(r >= 0.0 && r <= 1.0);
+    assert(c >= 0.0 && c <= 1.0);
+
+    int int_c = static_cast<int>(c*(cols-1));
+    int int_r = static_cast<int>(r*(rows-1));
+
+    return data[ind(int_r,int_c)];
 }
 
 void Image::set(int r, int c, const Vec3& v)

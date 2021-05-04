@@ -10,11 +10,12 @@
 class Image
 {
     private:
-        const int rows, cols;
+        int rows, cols;
         std::vector<Vec3> data;
 
     public:
         Image(int rows, int cols);
+        Image(const std::string& filename);
 
         int get_rows() const;
         int get_cols() const;
@@ -23,6 +24,7 @@ class Image
         std::string to_string() const;
 
         Vec3 get(int row, int col) const;
+        Vec3 get(double r, double c) const;
 
         void set(int row, int col, const Vec3& value);
 

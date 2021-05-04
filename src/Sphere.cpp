@@ -1,4 +1,7 @@
-#include <Sphere.h>
+#include "Sphere.h"
+#include "Utility.h"
+
+#include <assert.h>
 
 /*
     Ray-Sphere Intersection
@@ -35,8 +38,11 @@ bool Sphere::hit(const Ray& ray, double min_ray_length, double max_ray_length, H
     
     hit_rec.ray_length = ray_length;
     hit_rec.p = ray.at(hit_rec.ray_length);
-    hit_rec.set_face_normal(ray, this->get_outward_normal(hit_rec.p));
+    Vec3 outward_normal = this->get_outward_normal(hit_rec.p);
+    hit_rec.set_face_normal(ray, outward_normal);
     hit_rec.mat_ptr = mat_ptr;
+
+    get_sphere_uv(outward_normal, hit_rec.u, hit_rec.v);
 
     return true;
 }
@@ -44,4 +50,15 @@ bool Sphere::hit(const Ray& ray, double min_ray_length, double max_ray_length, H
 Vec3 Sphere::get_outward_normal(const Point3& p) const
 {
     return (p - center)/radius;
+}
+
+void Sphere::get_sphere_uv(const Point3& p, double& u, double &v)
+{
+    assert(approx_equals(p.length(), 1));
+
+    double theta = std::acos(-p.y());
+    double phi = std::atan2(-p.z(), p.x()) + PI;
+
+    u = phi / (2*PI);
+    v = theta / PI;
 }

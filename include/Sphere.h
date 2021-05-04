@@ -19,6 +19,9 @@ class Sphere : public Hittable
 
         Vec3 get_outward_normal(const Point3 &p) const;
         virtual bool hit(const Ray &ray, double min_ray_length, double max_ray_length, HitRecord &hit_rec) const override;
+
+    private:
+        static void get_sphere_uv(const Point3& p, double& u, double &v);
 };
 
 #endif

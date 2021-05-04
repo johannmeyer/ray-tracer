@@ -2,6 +2,7 @@
 #define MATERIAL_H
 
 #include "Hittable.h"
+#include "Texture.h"
 
 struct HitRecord;
 
@@ -14,9 +15,11 @@ class Material
 class Lambertian : public Material
 {
     public:
-        Color albedo;
+        std::shared_ptr<Texture> albedo;
 
-        Lambertian(const Color& albedo) : albedo(albedo) {}
+        Lambertian(const Color& albedo) : albedo(std::make_shared<SolidColor>(albedo)) {}
+        Lambertian(std::shared_ptr<Texture> albedo) : albedo(albedo) {}
+        Lambertian(const std::string& filename) : albedo(std::make_shared<ImageTexture>(filename)) {}
 
         virtual bool scatter(const Ray& incident, const HitRecord& rec, Color& attenuation, Ray& scattered) const override;
 };

@@ -16,10 +16,15 @@ set (CMAKE_CXX_STANDARD 11)
 # Header files
 include_directories(include)
 
-set(SRCS src/Image.cpp src/Sphere.cpp src/World.cpp src/Camera.cpp src/Lambertian.cpp src/Metal.cpp src/Dielectric.cpp)
+set(MATERIALS src/Lambertian.cpp src/Metal.cpp src/Dielectric.cpp)
+
+set(SRCS ${MATERIALS} src/Image.cpp src/Sphere.cpp src/World.cpp src/Camera.cpp  src/CheckerTexture.cpp src/ImageTexture.cpp)
 
 add_executable(RayTracer src/main.cpp ${SRCS})
+
+# Projects to test and illustrate using the library
 add_executable(ImageTest tests/ImageTest/ImageTest.cpp ${SRCS})
+add_executable(ImageTextureTest tests/ImageTextureTest/ImageTextureTest.cpp ${SRCS})
 
 # enable_testing()
 # add_test(ImageTest diff ImageTest.ppm ${PROJECT_SOURCE_DIR}/tests/ImageTest/golden_reference.ppm)

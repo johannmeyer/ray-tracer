@@ -15,6 +15,8 @@ struct HitRecord
     std::shared_ptr<Material> mat_ptr;
     double ray_length;
     bool front_face;
+    
+    double u, v; // uv coordinates of hit
 
     inline void set_face_normal(const Ray& ray, const Vec3& outward_normal)
     {

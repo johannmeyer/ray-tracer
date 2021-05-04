@@ -16,6 +16,7 @@ using Color = Vec3;    // RGB color
 
 // Function prototypes for free functions
 std::ostream& operator<<(std::ostream& out, const Vec3& v);
+std::istream& operator>>(std::istream& in, Vec3& v);
 Vec3 operator+(const Vec3& u, const Vec3& v);
 Vec3 operator-(const Vec3& u, const Vec3& v);
 Vec3 operator*(const Vec3& u, const Vec3& v);
@@ -172,6 +173,13 @@ inline std::ostream& operator<<(std::ostream& out, const Vec3& v)
     return out << v.data[0] << ' ' 
                << v.data[1] << ' '
                << v.data[2];
+}
+
+inline std::istream& operator>>(std::istream& in, Vec3& v)
+{
+    return in >> v.data[0] 
+              >> v.data[1]
+              >> v.data[2];
 }
 
 inline Vec3 operator+(const Vec3& u, const Vec3& v)

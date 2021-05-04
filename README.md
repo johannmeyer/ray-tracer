@@ -32,6 +32,27 @@ auto material_metal = std::make_shared<Metal>(Color(0.8, 0.8, 0.8), 0.3);
 auto material_dielectric   = std::make_shared<Dielectric>(Color(1,1,1), 1.5);
 ```
 
+## Textures
+Textures have currently been implemented for Lambertian materials only. 
+
+Implemented textures:
+* SolidColor
+* CheckerTexture
+* ImageTexture*
+
+*Image textures must be in uncompressed `.ppm` format (P3).
+
+![Image Texture](<./output-images/Image Texture.png>)
+
+```cpp
+// Create image texture material
+auto material_sphere =  std::make_shared<Lambertian>("earthmap.ppm");
+
+// Or to share textures between objects
+auto image_texture = std::make_shared<ImageTexture>("earthmap.ppm");
+auto material_sphere =  std::make_shared<Lambertian>(image_texture);
+```
+
 # Creating a Scene (World) and Adding Objects
 A world must be created and then each object should be added to the world. Currently, only spheres can be added to the world. Objects have a position, a size, and a material.
 
