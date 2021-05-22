@@ -6,13 +6,13 @@
 #include "Image.h"
 #include "World.h"
 #include "RenderSettings.h"
-#include "Orientation.h"
+#include "Transform.h"
 #include "CameraSettings.h"
 
 class Camera
 {
     private:
-        Orientation orientation;
+        Transform transform;
         Point3 top_left_corner;
         Vec3 horizontal;
         Vec3 vertical;
@@ -20,7 +20,7 @@ class Camera
         double lens_radius;
 
     public:
-        Camera(const Orientation& orientation, const CameraSettings& camera_settings);
+        Camera(const Transform& transform, const CameraSettings& camera_settings);
         
         Ray get_ray(double u, double v) const;
 

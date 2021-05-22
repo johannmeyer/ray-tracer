@@ -165,7 +165,7 @@ Image Image::to_ascii_image()
             old_color /= ASCII_LENGTH;
 
             // Use the intensity to determine which character should be used for the 
-            const int brightness = (old_color.x() + old_color.y() + old_color.z())*(ASCII_TABLE_LENGTH-1)/3.0;
+            const int brightness = static_cast<int>((old_color.x() + old_color.y() + old_color.z())*(ASCII_TABLE_LENGTH-1)/3.0);
             const bool *character = ASCII_TABLE[brightness];
             
             // This loop can be executed in parallel and enables resuse of the above data.

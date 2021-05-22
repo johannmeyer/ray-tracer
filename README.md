@@ -1,6 +1,50 @@
 # Ray Tracer in C++
 
-This project is based off the code from the Ray Tracing in One Weekend Series. The code structure has been changed to cleanup the main file and avoid implementation details in the main file. Moreover, the output is directly written to file and does not require output redirection to a file in the console. An ASCII renderer was also implemented.
+This project is based off the code from the Ray Tracing in One Weekend Series. The code structure has been changed to cleanup the main file and avoid implementation details in the main file. Moreover, the output is directly written to file and does not require output redirection to a file in the console. An ASCII renderer and Constructive Solid Geometry was also implemented.
+
+## Debugging
+
+I have created a `cmake-variants.yaml` for use in `Visual Studio Code`; however, it is still possible to compile the different variants by running `cmake` with the `--config` flag.
+
+Valid configurations:
+* Debug
+* DebugOptimised
+* Release
+
+The `Debug` variant uses no optimisation levels and is therefore suitable for debugging with breakpoints. `DebugOptimised` enables optimisations but keeps `asserts`. `Release` removes the `asserts`.
+
+## Tests
+
+The tests are `bash` script files and the `checksum.txt` have been generated on a `Linux` system. These limitations mean that new scripts would need to be implemented for `Windows` and additional `checksum.txt`'s. The additional checksum would be necessary as some of the examples involve using the builtin random number generator and this differs per platform. The tests can be executed by running `make test --output-on-failure`.
+
+# Constructive Solid Geometry
+
+The library supports constructive solid geometry by using signed distance fields. The operations also support different materials. The signed distance functions were retrieved from [Inigo Quilez](https://iquilezles.org/www/articles/distfunctions/distfunctions.htm).
+
+Supported operations:
+* Merge
+* Subtraction
+* Intersection
+
+Supported Signed Distance Functions:
+* Box
+* BoxFrame
+* BoxRounded
+* Cylinder
+* Sphere
+* Torus
+
+## Example
+
+Two examples are included in the `examples` folder under the `ImplicitFunction` folder.
+
+The first example illustrates the necessity for the `merge` operation by overlapping three tori. The overlapping tori results in shadow acne (black spots on the object on the left) as the intersections are affected by floating-point precision problems. By using the `merge` operation, this problem is avoided.
+
+![Overlapping Tori](output-images/tori.png)
+
+The seond example illustrates all three supported operations and recreates the figure at [Wikipedia CSG](https://en.wikipedia.org/wiki/Constructive_solid_geometry). It consists of three cylinders, one sphere, and one cube.
+
+![Wikipedia CSG example](output-images/csg.png)
 
 # ASCII Renderer
 
@@ -54,13 +98,13 @@ auto material_sphere =  std::make_shared<Lambertian>(image_texture);
 ```
 
 # Creating a Scene (World) and Adding Objects
-A world must be created and then each object should be added to the world. Currently, only spheres can be added to the world. Objects have a position, a size, and a material.
+A world must be created and then each object should be added to the world. Objects have a position, a size, and a material.
 
 ## Example
 ```cpp
 #include "World.h"
 #include "Material.h"
-#include "Sphere.h"
+#include "ImplicitShape.h"
 #include "Vec3.h"
 
 World world;
@@ -70,6 +114,27 @@ const Point3 position = Point3(0.0, 0.0, -1.0);
 const double radius = 0.5;
 auto material = std::make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
 world.add(std::make_shared<Sphere>(position, radius, material));
+```
+
+## Instancing
+
+Instances can be made of objects that share the same material. These instances can then be translated and rotated.
+
+```cpp
+#include "Instance.h"
+#include "Utility.h" // for degrees_to_radians()
+
+Vec3 offset(1,0,0)
+auto translated_sphere = Translation::create(sphere, offset);
+
+// Rotation using axis-angle approach
+Vec3 rotation_axis = Vec3(0,0,1);
+double rotation_angle = degrees_to_radians(90);
+Basis rotated_basis = Basis().rotate(rotation_axis, rotation_angle);
+auto rotated_cylinder = Rotation::create(cylinder, rotated_basis); 
+
+Transform transform;
+auto transformed_torus = Instance::create(torus, transform);
 ```
 
 ## Hollow Objects
@@ -95,7 +160,7 @@ To ray trace a scene, a camera needs to be added. The call to `get_image()` rast
 Point3 lookfrom(13,2,3);
 Point3 lookat(0,0,0);
 Vec3 vup(0,1,0);
-Orientation orientation(lookfrom, lookat, vup);
+Transform transform(lookfrom, lookat, vup);
 
 // Set camera settings
 CameraSettings camera_settings;
@@ -106,7 +171,7 @@ const double focus_dist = 10.0;
 camera_settings.depth_of_field(aperture, focus_dist);
 
 // Create camera
-Camera camera(orientation, camera_settings);
+Camera camera(transform, camera_settings);
 
 // Capture scene
 RenderSettings render_settings;
@@ -115,4 +180,19 @@ Image image = camera.get_image(world, render_settings);
 
 // Save images to files
 image.save_image("ray-traced-image.ppm");
+```
+
+# Complex Scenes
+
+The greater the number of objects in the scene, the more important accelerating data structures become. A bounding volume hierarchy (BVH) tree is implemented and takes in a `World` object as input. A BVH tree can only be created when the `World` object contains **2 or more** objects. The BVH tree uses a simple heuristic for splitting: the minimum bounding box coordinate in the selected dimension. Each level of the hierarchy randomly selects the axis to perform the sorting. `RayTracingInOneWeekend` in the `examples` folder demonstrates using the BVH tree in a scene.
+
+## Example
+```cpp
+World world_objects;
+// world_objects.add(object_1)
+// ...
+// world_objects.add(object_n)
+
+World world;
+world.add(BVHNode::create(world_objects));
 ```

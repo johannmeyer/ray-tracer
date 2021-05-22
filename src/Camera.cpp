@@ -1,9 +1,10 @@
 #include "Camera.h"
 #include "Utility.h"
+#include "ProgressBar.h"
 
 
-Camera::Camera(const Orientation& orientation, const CameraSettings& camera_settings) :
-    orientation(orientation),
+Camera::Camera(const Transform& transform, const CameraSettings& camera_settings) :
+    transform(transform),
     aspect_ratio(camera_settings.aspect_ratio)
 {
     double theta = degrees_to_radians(camera_settings.vertical_fov);
@@ -12,11 +13,11 @@ Camera::Camera(const Orientation& orientation, const CameraSettings& camera_sett
     double viewport_height = 2.0 * h;
     double viewport_width = aspect_ratio * viewport_height;
 
-    this->orientation.to_cam_basis();
+    this->transform.to_cam_basis();
 
-    horizontal = camera_settings.focus_dist * viewport_width * this->orientation.basis.x; // positive right
-    vertical = camera_settings.focus_dist * viewport_height * this->orientation.basis.y; // positive down
-    top_left_corner = orientation.origin - horizontal/2 - vertical/2 + camera_settings.focus_dist*this->orientation.basis.z;
+    horizontal = camera_settings.focus_dist * viewport_width * this->transform.basis.x; // positive right
+    vertical = camera_settings.focus_dist * viewport_height * this->transform.basis.y; // positive down
+    top_left_corner = transform.origin - horizontal/2 - vertical/2 + camera_settings.focus_dist*this->transform.basis.z;
 
     lens_radius = camera_settings.aperture/2;
 }
@@ -24,7 +25,7 @@ Camera::Camera(const Orientation& orientation, const CameraSettings& camera_sett
 Ray Camera::get_ray(double u, double v) const
 {
     Vec3 perturbation = lens_radius * Vec3::random_in_unit_circle();
-    Vec3 offset = orientation.origin + orientation.basis.x*perturbation.x() + orientation.basis.y*perturbation.y();
+    Vec3 offset = transform.origin + transform.basis.x*perturbation.x() + transform.basis.y*perturbation.y();
     return Ray(offset, top_left_corner + u*horizontal + v*vertical - offset);
 }
 
@@ -38,6 +39,7 @@ Image Camera::get_image(World world, const RenderSettings& render_settings) cons
     const int image_rows = static_cast<int>(image_cols / aspect_ratio);
     Image image(image_rows, image_cols);
 
+    ProgressBar progress(image_rows-1, "Ray tracing");
     for (int r = 0; r < image_rows; r++)
     {
         for (int c = 0; c < image_cols; c++)
@@ -52,7 +54,8 @@ Image Camera::get_image(World world, const RenderSettings& render_settings) cons
             }
             image.set(r, c, pixel_color/samples_per_pixel);
         }
-        std::cerr << r*100/image_rows << "% complete" << std::endl;
+        progress.update(r);
     }
+    
     return image;
 }

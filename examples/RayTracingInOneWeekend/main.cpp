@@ -5,24 +5,30 @@
 #include "Vec3.h"
 #include "Utility.h"
 #include "World.h"
-#include "Sphere.h"
 #include "Camera.h"
 #include "Material.h"
+#include "Texture.h"
+#include "BVH.h"
+#include "Instance.h"
 
 World create_scene()
 {
-    World world;
-    auto material_ground = std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5)); 
-    world.add(std::make_shared<Sphere>(Point3( 0.0, -1000, 0.0), 1000.0, material_ground));
+    World world_objects;
+    auto material_ground = std::make_shared<Lambertian>(Color(0.5)); 
+    auto ground = std::make_shared<Sphere>(1000.0, material_ground);
+    world_objects.add(Translation::create(ground, Point3( 0.0, -1000, 0.0)));
 
-    auto material1 = std::make_shared<Dielectric>(Color(1,1,1), 1.5);
-    world.add(std::make_shared<Sphere>(Point3(0, 1, 0), 1.0, material1));
+    auto material_dielectric = std::make_shared<Dielectric>(Color(1,1,1), 1.5);
+    auto sphere_dielectric = std::make_shared<Sphere>(1.0, material_dielectric);
+    world_objects.add(Translation::create(sphere_dielectric, Point3(0, 1, 0)));
 
-    auto material2 = std::make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
-    world.add(std::make_shared<Sphere>(Point3(-4, 1, 0), 1.0, material2));
+    auto material_lambertian = std::make_shared<Lambertian>(Color(0.4, 0.2, 0.1));
+    auto sphere_lambertian = std::make_shared<Sphere>(1.0, material_lambertian);
+    world_objects.add(Translation::create(sphere_lambertian, Point3(-4, 1, 0)));
 
-    auto material3 = std::make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.0);
-    world.add(std::make_shared<Sphere>(Point3(4, 1, 0), 1.0, material3));
+    auto material_metal = std::make_shared<Metal>(Color(0.7, 0.6, 0.5), 0.0);
+    auto sphere_metal = std::make_shared<Sphere>(1.0, material_metal);
+    world_objects.add(Translation::create(sphere_metal, Point3(4, 1, 0)));
 
     for (int i = -11; i < 11; i++)
     {
@@ -48,12 +54,16 @@ World create_scene()
                 }
                 else
                 {
-                    material = std::make_shared<Dielectric>(Color(1,1,1), 1.5);
+                    material = material_dielectric;
                 }
-                world.add(std::make_shared<Sphere>(center, 0.2, material));
+                auto sphere = std::make_shared<Sphere>(0.2, material);
+                world_objects.add(Translation::create(sphere, center));
             }
         }
     }
+    // store it in a BVH Tree for faster ray collision testing
+    World world;
+    world.add(BVHNode::create(world_objects));
     return world;
 }
 
@@ -62,15 +72,15 @@ Camera create_camera()
     Point3 lookfrom(13,2,3);
     Point3 lookat(0,0,0);
     Vec3 vup(0,1,0);
-    Orientation orientation(lookfrom, lookat, vup);
+    Transform transform(lookfrom, lookat, vup);
 
     CameraSettings camera_settings;
     camera_settings.aspect_ratio = 3.0/2.0;
     camera_settings.vertical_fov = 20;
     const double aperture = 0.1;
-    const double focus_dist = 10.0;
+    const double focus_dist = 10;
     camera_settings.depth_of_field(aperture, focus_dist);
-    return Camera(orientation, camera_settings);
+    return Camera(transform, camera_settings);
 }
 
 int main()
@@ -83,13 +93,13 @@ int main()
     
     // Capture scene
     RenderSettings render_settings;
-    render_settings.samples_per_pixel = 500;
+    render_settings.samples_per_pixel = 100;
+    render_settings.image_width = 400;
+    render_settings.max_ray_collisions = 50;
     Image image = camera.get_image(world, render_settings);
 
     // Save images to files
-    image.save_image("out.ppm");
-    Image ascii_image = image.to_ascii_image();
-    ascii_image.save_image("ascii.ppm");
-
+    image.save_image("RayTracingInOneWeekend.ppm");
+    
     return 0;
 }

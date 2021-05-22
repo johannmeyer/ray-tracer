@@ -12,7 +12,7 @@ class Ray
     public:
         Ray() {}
         Ray(const Point3 &origin, const Vec3 &direction):
-                mOrigin(origin), mDirection(direction) {}
+                mOrigin(origin), mDirection(unit_vector(direction)) {}
         
         Point3 origin() const { return mOrigin; }
         Vec3 direction() const { return mDirection; }

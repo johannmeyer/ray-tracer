@@ -32,6 +32,14 @@ inline double random_double(double min, double max)
     return min + (max - min)*random_double();
 }
 
+/*
+    Random int in [min, max]
+*/
+inline int random_int(int min, int max)
+{
+    return static_cast<int>(random_double(min, max+1));
+}
+
 inline double clamp(double x, double min, double max)
 {
     if (x < min) return min;
@@ -41,7 +49,18 @@ inline double clamp(double x, double min, double max)
 
 inline bool approx_equals(double x, double y)
 {
-    return std::fabs(x-y) < epsilon;
+    return std::abs(x-y) < epsilon;
+}
+
+inline double sign(double x)
+{
+    return x > 0 ? 1 :
+           x < 0 ? -1 : 0;
+}
+
+inline double mix(double x, double y, double mix_factor)
+{
+    return (1-mix_factor)*x + mix_factor*y;
 }
 
 #endif

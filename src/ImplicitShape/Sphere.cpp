@@ -1,5 +1,4 @@
-#include "Sphere.h"
-#include "Utility.h"
+#include "ImplicitShape.h"
 
 #include <assert.h>
 
@@ -12,13 +11,10 @@
 */
 bool Sphere::hit(const Ray& ray, double min_ray_length, double max_ray_length, HitRecord& hit_rec) const
 {
-    // vector ray origin -> sphere center
-    Vec3 oc = ray.origin() - this->center;
-    
     // Code simplifies by changing b to b/2.
     double a = ray.direction().length_squared();
-    double half_b = dot(oc, ray.direction());
-    double c = oc.length_squared() - radius*radius;
+    double half_b = dot(ray.origin(), ray.direction());
+    double c = ray.origin().length_squared() - radius*radius;
 
     double discriminant = half_b*half_b - a*c;
 
@@ -49,7 +45,7 @@ bool Sphere::hit(const Ray& ray, double min_ray_length, double max_ray_length, H
 
 Vec3 Sphere::get_outward_normal(const Point3& p) const
 {
-    return (p - center)/radius;
+    return p/radius;
 }
 
 void Sphere::get_sphere_uv(const Point3& p, double& u, double &v)
@@ -61,4 +57,15 @@ void Sphere::get_sphere_uv(const Point3& p, double& u, double &v)
 
     u = phi / (2*PI);
     v = theta / PI;
+}
+
+void Sphere::bounding_box(AABB& output_box) const
+{
+    double abs_radius = std::abs(radius); // for hollow spheres
+    output_box = AABB(- Vec3(abs_radius), Vec3(abs_radius));
+}
+
+double Sphere::get_distance(const Point3& p) const
+{
+    return p.length() - radius;
 }

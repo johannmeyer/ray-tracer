@@ -1,0 +1,15 @@
+buildType:
+  default: debug-optimised
+  choices:
+    debug:
+      short: Debug
+      long: Emit debug information (slowest)
+      buildType: Debug
+    release:
+      short: Release
+      long: Disable asserts and enable optimisations (fastest)
+      buildType: Release
+    debug-optimised:
+      short: Debug Optimised
+      long: Enable asserts and optimisations
+      buildType: DebugOptimised

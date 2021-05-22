@@ -68,3 +68,18 @@ Color World::get_background_color(const Ray& ray) const
     // blend between white and light blue
     return (1.0-t)*Color(1.0, 1.0, 1.0) + t*Color(0.5, 0.7, 1.0);
 }
+
+void World::bounding_box(AABB& output_box) const
+{
+    // This function appears unused.
+    if (objects.empty())
+        return;
+    std::cout << "World bounding box called (report unused function called)" << std::endl;
+    AABB temp_box;
+
+    for (const auto& object : objects)
+    {
+        object->bounding_box(temp_box);
+        output_box = AABB::surrounding_box(output_box, temp_box);
+    }
+}

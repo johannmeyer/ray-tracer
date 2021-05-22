@@ -1,0 +1,2 @@
+add_executable(DistantView main.cpp)
+target_link_libraries(DistantView RayTracer)

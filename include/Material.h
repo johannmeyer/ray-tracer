@@ -17,6 +17,7 @@ class Lambertian : public Material
     public:
         std::shared_ptr<Texture> albedo;
 
+        Lambertian() : Lambertian(Color(1,0,1)) {}
         Lambertian(const Color& albedo) : albedo(std::make_shared<SolidColor>(albedo)) {}
         Lambertian(std::shared_ptr<Texture> albedo) : albedo(albedo) {}
         Lambertian(const std::string& filename) : albedo(std::make_shared<ImageTexture>(filename)) {}

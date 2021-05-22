@@ -33,7 +33,8 @@ class Vec3
     public:
         double data[3];
 
-        Vec3(): data{0,0,0} {}
+        Vec3(): Vec3(0) {}
+        Vec3(double s) : data{s,s,s} {}
         Vec3(double d0, double d1, double d2): data{d0,d1,d2} {}
 
         double x() const { return data[0]; }
@@ -116,6 +117,11 @@ class Vec3
             return ray_out_perp + ray_out_parallel;
         }
 
+        Vec3 rotate(const Vec3& axis, const double angle) const
+        {
+            return cos(angle)*(*this) + sin(angle)*cross(axis, *this) + (1 - cos(angle))*dot(axis, *this)*axis;
+        }
+
         inline static Vec3 random()
         {
             return Vec3(random_double(), random_double(), random_double());
@@ -196,6 +202,13 @@ inline Vec3 operator-(const Vec3& u, const Vec3& v)
                 u.data[2] - v.data[2]);
 }
 
+inline Vec3 operator-(const Vec3& u, double s)
+{
+    return Vec3(u.data[0] - s,
+                u.data[1] - s,
+                u.data[2] - s);
+}
+
 inline Vec3 operator*(const Vec3& u, const Vec3& v)
 {
     return Vec3(u.data[0] * v.data[0],
@@ -239,6 +252,41 @@ inline Vec3 unit_vector(const Vec3& v)
     //     return v/(length + 1e-6);
     // }
     return v/v.length();
+}
+
+inline Vec3 abs(const Vec3& v)
+{
+    return Vec3(std::abs(v.x()), std::abs(v.y()), std::abs(v.z()));
+}
+
+inline double max_element(const Vec3& v)
+{
+    return std::max(v.x(), std::max(v.y(), v.z()));
+}
+
+inline double min_element(const Vec3& v)
+{
+    return std::min(v.x(), std::min(v.y(), v.z()));
+}
+
+inline Vec3 max(const Vec3& v, double s)
+{
+    return Vec3(std::max(v.x(), s), std::max(v.y(), s), std::max(v.z(), s));
+}
+
+inline Vec3 min(const Vec3& v, double s)
+{
+    return Vec3(std::min(v.x(), s), std::min(v.y(), s), std::min(v.z(), s));
+}
+
+inline Vec3 max(const Vec3& v, const Vec3& u)
+{
+    return Vec3(std::max(v.x(), u.x()), std::max(v.y(), u.y()), std::max(v.z(), u.z()));
+}
+
+inline Vec3 min(const Vec3& v, const Vec3& u)
+{
+    return Vec3(std::min(v.x(), u.x()), std::min(v.y(), u.y()), std::min(v.z(), u.z()));
 }
 
 #endif

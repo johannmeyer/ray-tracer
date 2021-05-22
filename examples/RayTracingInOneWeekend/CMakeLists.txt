@@ -1,0 +1,2 @@
+add_executable(RayTracingInOneWeekend main.cpp)
+target_link_libraries(RayTracingInOneWeekend RayTracer)

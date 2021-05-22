@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.13)
 
 project(RayTracer)
 
@@ -8,23 +8,28 @@ set (CMAKE_CXX_STANDARD 11)
 # This helps find bugs and leads to better code in general
 # lots of warnings and all warnings as errors. -march=native
 # resulted in marginally worse performance.
-add_compile_options(-O3 -Wall -Wextra -pedantic -Werror -ffast-math)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-Wall -Wextra -pedantic -Werror -Wconversion)
+    message(STATUS "Hello World: ${CMAKE_BUILD_TYPE}")
+    if(CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "DebugOptimised")
+        add_compile_options(-O3 -ffast-math) # optimisations in code (disable for debugging)
+    endif()
 
-# C++11 to get some newer features like move semantics etc
-set (CMAKE_CXX_STANDARD 11)
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_compile_options(-DNDEBUG) # remove asserts
+    endif()
+endif()
 
 # Header files
 include_directories(include)
 
-set(MATERIALS src/Lambertian.cpp src/Metal.cpp src/Dielectric.cpp)
+add_library(RayTracer "")
 
-set(SRCS ${MATERIALS} src/Image.cpp src/Sphere.cpp src/World.cpp src/Camera.cpp  src/CheckerTexture.cpp src/ImageTexture.cpp)
+add_subdirectory(src)
 
-add_executable(RayTracer src/main.cpp ${SRCS})
+# Examples
+add_subdirectory(examples)
 
-# Projects to test and illustrate using the library
-add_executable(ImageTest tests/ImageTest/ImageTest.cpp ${SRCS})
-add_executable(ImageTextureTest tests/ImageTextureTest/ImageTextureTest.cpp ${SRCS})
-
-# enable_testing()
-# add_test(ImageTest diff ImageTest.ppm ${PROJECT_SOURCE_DIR}/tests/ImageTest/golden_reference.ppm)
+# Test suite (Checksums and scripts only work on Linux)
+enable_testing()
+add_subdirectory(tests)

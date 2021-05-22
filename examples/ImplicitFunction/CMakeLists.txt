@@ -1,0 +1,2 @@
+add_executable(ImplicitFunction main.cpp)
+target_link_libraries(ImplicitFunction RayTracer)
